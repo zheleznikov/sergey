@@ -480,6 +480,7 @@
     function onCardPointerDown(e) {
       if (e.button !== 0) return;
       if (e.target.closest && e.target.closest('a')) return;
+      if (window.matchMedia('(max-width: 767px)').matches) return;
       e.preventDefault();
       var rect = projectCard.getBoundingClientRect();
       cardDragging = true;

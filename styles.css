@@ -433,6 +433,13 @@ body.bubbles-visible .hero__play-hint {
   height: fit-content;
 }
 
+@media (max-width: 767px) {
+  .project-card {
+    cursor: default;
+    touch-action: auto;
+  }
+}
+
 .project-cards-stack {
   display: flex;
   flex-direction: column;
