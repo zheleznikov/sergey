@@ -460,4 +460,81 @@
     }
     requestAnimationFrame(tick);
   }
+
+  /* Перетаскиваемые карточки проектов */
+  var projectCards = document.querySelectorAll('.project-card');
+  var trashForCard = document.getElementById('trash');
+
+  function isOverTrashCard(clientX, clientY) {
+    if (!trashForCard || trashForCard.getBoundingClientRect().height === 0) return false;
+    var rect = trashForCard.getBoundingClientRect();
+    return clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
+  }
+
+  projectCards.forEach(function (projectCard) {
+    var cardDragging = false;
+    var cardPointerId = null;
+    var cardOffsetX = 0;
+    var cardOffsetY = 0;
+
+    function onCardPointerDown(e) {
+      if (e.button !== 0) return;
+      if (e.target.closest && e.target.closest('a')) return;
+      e.preventDefault();
+      var rect = projectCard.getBoundingClientRect();
+      cardDragging = true;
+      cardPointerId = e.pointerId;
+      cardOffsetX = e.clientX - rect.left;
+      cardOffsetY = e.clientY - rect.top;
+      projectCard.classList.add('is-dragging');
+      projectCard.style.position = 'fixed';
+      projectCard.style.left = rect.left + 'px';
+      projectCard.style.top = rect.top + 'px';
+      projectCard.style.width = rect.width + 'px';
+      projectCard.style.boxSizing = 'border-box';
+      projectCard.setPointerCapture(e.pointerId);
+    }
+
+    function onCardPointerMove(e) {
+      if (!cardDragging || e.pointerId !== cardPointerId) return;
+      e.preventDefault();
+      if (trashForCard) {
+        if (isOverTrashCard(e.clientX, e.clientY)) trashForCard.classList.add('is-over');
+        else trashForCard.classList.remove('is-over');
+      }
+      projectCard.style.left = (e.clientX - cardOffsetX) + 'px';
+      projectCard.style.top = (e.clientY - cardOffsetY) + 'px';
+    }
+
+    function onCardPointerUp(e) {
+      if (e.pointerId !== cardPointerId) return;
+      if (e.type === 'pointercancel') {
+        cardDragging = false;
+        cardPointerId = null;
+        projectCard.classList.remove('is-dragging');
+        projectCard.style.position = '';
+        projectCard.style.left = '';
+        projectCard.style.top = '';
+        projectCard.style.width = '';
+        projectCard.style.boxSizing = '';
+        if (trashForCard) trashForCard.classList.remove('is-over');
+        return;
+      }
+      if (isOverTrashCard(e.clientX, e.clientY)) {
+        projectCard.remove();
+        if (trashForCard) trashForCard.classList.remove('is-over');
+        return;
+      }
+      if (trashForCard) trashForCard.classList.remove('is-over');
+      cardDragging = false;
+      cardPointerId = null;
+      projectCard.classList.remove('is-dragging');
+    }
+
+    projectCard.addEventListener('pointerdown', onCardPointerDown);
+    projectCard.addEventListener('pointermove', onCardPointerMove);
+    projectCard.addEventListener('pointerup', onCardPointerUp);
+    projectCard.addEventListener('pointercancel', onCardPointerUp);
+    projectCard.setAttribute('title', 'Перетащите в корзину — удалится');
+  });
 })();
