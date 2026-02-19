@@ -20,6 +20,7 @@
     });
   }
 
+
   var themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
     themeToggle.addEventListener('click', function () {
